@@ -137,6 +137,10 @@ DATABASES = {
         'PORT': '',
     }
 }
+# Print the variables for debugging
+print("DATABASE NAME: ", os.getenv('POSTGRES_DATABASE', None))
+print("DATABASE USER: ", os.getenv('POSTGRES_USERNAME', None))
+print("DATABASE PASSWORD: ", os.getenv('POSTGRES_PASSWORD', None))
 
 ADMINS = [
     # ('Joshua Silvasstar', 'joshva.silvasstar@clinicchat.com'),
