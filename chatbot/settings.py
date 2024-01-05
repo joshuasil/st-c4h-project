@@ -63,7 +63,7 @@ DEBUG = False
 CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = [
-'localhost','140.226.4.15','st.chat4heart.ucdenver.edu','127.0.0.1','pd2vweb871.ucdenver.pvt',
+'localhost','140.226.4.15','st.chat4heart.ucdenver.edu','127.0.0.1','pd2vweb871.ucdenver.pvt','140.226.13.221'
 ]
 
 
