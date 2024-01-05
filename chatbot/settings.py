@@ -15,24 +15,39 @@ import os
 from dotenv import load_dotenv
 import logging
 import sentry_sdk
-load_dotenv()
 
-
+environment = os.getenv("ENVIRONMENT")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+if environment == "dev":
+    dotenv_path = BASE_DIR / '.env'
+else:
+    dotenv_path = BASE_DIR.parent / '.env'
+
+# Load the .env file
+load_dotenv(dotenv_path=dotenv_path)
+
+
+
 
 
 #disable registration
 REGISTRATION_OPEN = False
 
+
+
+
+
+# Choose the DSN based on the environment
+if environment == "dev":
+    dsn = "https://6c354df327d274cee17b78ed5784bea3@o4505835707957248.ingest.sentry.io/4506515913572352"
+else:
+    dsn = "https://3ff61de170e72b5dbf67ed3c7d4213f2@o4505835707957248.ingest.sentry.io/4506515865796608"
+
 sentry_sdk.init(
-    dsn="https://3ff61de170e72b5dbf67ed3c7d4213f2@o4505835707957248.ingest.sentry.io/4506515865796608",
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
+    dsn=dsn,
     traces_sample_rate=1.0,
-    # Set profiles_sample_rate to 1.0 to profile 100%
-    # of sampled transactions.
-    # We recommend adjusting this value in production.
     profiles_sample_rate=1.0,
 )
 
@@ -115,9 +130,9 @@ WSGI_APPLICATION = 'chatbot.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_test',
-        'USER': 'silvassj',
-        'PASSWORD': 'HcBPwiXIu8mnP10I',
+        'NAME': os.getenv('POSTGRES_DATABASE', None),
+        'USER': os.getenv('POSTGRES_USERNAME', None),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', None),
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -211,7 +226,9 @@ DEFAULT_TO_EMAIL = [
                     ]
 
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'debug.log')
-HANDLER_OPTIONS = ['console', 'file', 'db_log']
+HANDLER_OPTIONS = ['console', 'file', 
+                #    'db_log'
+                   ]
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
