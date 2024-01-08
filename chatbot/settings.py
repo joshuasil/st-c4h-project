@@ -127,13 +127,18 @@ WSGI_APPLICATION = 'chatbot.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+if environment == "dev":
+    POSTGRES_HOST = 'localhost'
+else:
+    POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'localhost')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.getenv('POSTGRES_DATABASE', None),
         'USER': os.getenv('POSTGRES_USERNAME', None),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', None),
-        'HOST': 'localhost',
+        'HOST': POSTGRES_HOST,
         'PORT': '',
     }
 }
