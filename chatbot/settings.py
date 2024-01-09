@@ -26,6 +26,7 @@ if 'D2V-SilvasstarMBP' in hostname:
     environment = 'dev'
     print("Running on local machine")
 else:
+    environment = 'prod'
     print("Running on production server")
 
 
