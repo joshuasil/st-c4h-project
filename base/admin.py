@@ -4,6 +4,7 @@ from import_export.admin import ImportExportModelAdmin
 from django.urls import reverse
 from django.utils.html import format_html
 from .aws_kms_functions import decrypt_data
+from django import forms
 
 # Register your models here.
 # admin.site.register(PhoneNumber)
@@ -15,6 +16,17 @@ admin.site.register(TopicGoal)
 
 # admin.site.register(TextMessage)
 
+class PhoneNumberForm(forms.ModelForm):
+    class Meta:
+        model = PhoneNumber
+        exclude = ["phone_number_hash"]
+
+    def __init__(self, *args, **kwargs):
+        super(PhoneNumberForm, self).__init__(*args, **kwargs)
+        if self.instance.pk:  # Check if the instance is being updated
+            # Decrypt the phone_number and name
+            self.initial['phone_number'] = decrypt_data(self.instance.phone_number, self.instance.phone_number_key)
+            self.initial['name'] = decrypt_data(self.instance.name, self.instance.name_key)
 
 class ArmAdmin(ImportExportModelAdmin):
     list_display = ('name', 'phone_numbers_with_subgroups', 'phone_numbers_without_subgroups')
@@ -57,9 +69,11 @@ from django.utils.html import format_html
 @admin.register(PhoneNumber)
 class PhoneNumberAdmin(ImportExportModelAdmin):
     list_display = ('id', 'get_decrypted_phone_number', 'arm', 'get_decrypted_name', 'active', 'opted_in', 'created_at', 'sub_group')
+    exclude = ["phone_number_hash"]
     list_filter = ('arm', 'active', 'opted_in', 'sub_group')
     date_hierarchy = 'created_at'
     ordering = ('-created_at',)
+    form = PhoneNumberForm
     list_per_page = 15
 
     def get_decrypted_phone_number(self, obj):
@@ -70,7 +84,7 @@ class PhoneNumberAdmin(ImportExportModelAdmin):
     def get_decrypted_name(self, obj):
         decrypted_name = decrypt_data(obj.name, obj.name_key.tobytes())
         return format_html('<span>{}</span>', decrypted_name)
-    get_decrypted_phone_number.short_description = 'Name'
+    get_decrypted_name.short_description = 'Name'
 
 @admin.register(WeeklyTopic)
 class WeeklyTopicAdmin(ImportExportModelAdmin):

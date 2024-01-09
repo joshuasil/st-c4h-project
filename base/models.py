@@ -36,7 +36,8 @@ class PhoneNumber(models.Model):
     )
     arm = models.ForeignKey(Arm, on_delete=models.SET_DEFAULT, default=1,
                             help_text="Select the arm to which this number belongs. If the arm you wish to select doesn't exist, please create it first.")
-    phone_number = models.TextField(unique=True, blank=False,validators=[phone_number_validator],
+    phone_number = models.TextField(unique=True, blank=False,
+                                    # validators=[phone_number_validator],
                                     help_text="Enter the 11 digit phone number in the format 1234567890 (no spaces or dashes).")
     phone_number_key = models.BinaryField()
     phone_number_hash = models.CharField(max_length=64, unique=True, blank=True, null=True)
@@ -77,13 +78,23 @@ class PhoneNumber(models.Model):
     def validate_unique(self, exclude=None):
         super().validate_unique(exclude)
 
-        if self.__class__.objects.filter(phone_number_hash=hashlib.sha256(self.phone_number.encode()).hexdigest()).exists():
+        # Generate the hash for the current phone number
+        current_phone_number_hash = hashlib.sha256(self.phone_number.encode()).hexdigest()
+
+        # Query for any other instances with the same phone number hash
+        existing = self.__class__.objects.filter(phone_number_hash=current_phone_number_hash)
+
+        if self.pk:  # Exclude the current instance if it's an update
+            existing = existing.exclude(pk=self.pk)
+
+        if existing.exists():
             raise ValidationError({
                 'phone_number': ValidationError(
                     'Phone number already exists.',
                     code='unique',
                 ),
             })
+        
     @transaction.atomic
     def save(self, *args, **kwargs):
 
