@@ -3,6 +3,7 @@ from .models import PhoneNumber, Arm, ScheduledMessage, TextMessage, Topic, Week
 from import_export.admin import ImportExportModelAdmin
 from django.urls import reverse
 from django.utils.html import format_html
+from .aws_kms_functions import decrypt_data
 
 # Register your models here.
 # admin.site.register(PhoneNumber)
@@ -51,13 +52,25 @@ class TextMessageAdmin(ImportExportModelAdmin):
 
 
 
+from django.utils.html import format_html
+
 @admin.register(PhoneNumber)
 class PhoneNumberAdmin(ImportExportModelAdmin):
-    list_display = ('id','phone_number', 'arm', 'name', 'active','opted_in','created_at', 'sub_group')
+    list_display = ('id', 'get_decrypted_phone_number', 'arm', 'get_decrypted_name', 'active', 'opted_in', 'created_at', 'sub_group')
     list_filter = ('arm', 'active', 'opted_in', 'sub_group')
     date_hierarchy = 'created_at'
     ordering = ('-created_at',)
     list_per_page = 15
+
+    def get_decrypted_phone_number(self, obj):
+        decrypted_phone_number = decrypt_data(obj.phone_number, obj.phone_number_key.tobytes())
+        return format_html('<span>{}</span>', decrypted_phone_number)
+    get_decrypted_phone_number.short_description = 'Phone Number' 
+
+    def get_decrypted_name(self, obj):
+        decrypted_name = decrypt_data(obj.name, obj.name_key.tobytes())
+        return format_html('<span>{}</span>', decrypted_name)
+    get_decrypted_phone_number.short_description = 'Name'
 
 @admin.register(WeeklyTopic)
 class WeeklyTopicAdmin(ImportExportModelAdmin):

@@ -10,12 +10,13 @@ import vonage
 from django.http import HttpResponse, JsonResponse
 client = vonage.Client(key=settings.VONAGE_KEY, secret=settings.VONAGE_SECRET)
 import time
-
+from django.db import transaction
+import hashlib
 from .send_message_vonage import *
+from .aws_kms_functions import *
 
-# Create your models here.
-welcome_message = "Clinic Chat & Denver Health welcome you to Chat 4 Heart Health! We'll send you 4-5 messages every few days on different topics to support healthy habits.  You will be able ask me questions anytime, day or night and working with me could help you stay healthy. Anything you ask me is kept private. If you prefer messages in Spanish, text '1' here; Si prefieres mensajes en español, envía el mensaje '1' aquí. To get started, please answer this survey with questions about your health--if you have already answered this, thank you! We'll start sending you messages shortly."
-welcome_message_es = "¡Clinic Chat y Denver Health le da la bienvenida a Chat del Corazón ! Le enviaremos de 4 a 5 mensajes cada pocos días sobre diferentes temas para fomentar hábitos saludables. Podrás hacerme preguntas en cualquier momento, de día o de noche, y trabajar conmigo podría ayudarte a mantenerte saludable. Todo lo que me preguntes se mantendrá privado. Para comenzar, complete esta encuesta rápida sobre su salud. Si ya has respondido esto, ¡gracias! Si ya has respondido esto, ¡gracias! Le enviaremos mensajes en breve."
+welcome_message = settings.WELCOME_MESSAGE
+welcome_message_es = settings.WELCOME_MESSAGE_ES
 class Arm(models.Model):
     name = models.CharField(max_length=100, unique=True, blank=False)
     description = models.TextField(blank=True, null=True)
@@ -35,10 +36,13 @@ class PhoneNumber(models.Model):
     )
     arm = models.ForeignKey(Arm, on_delete=models.SET_DEFAULT, default=1,
                             help_text="Select the arm to which this number belongs. If the arm you wish to select doesn't exist, please create it first.")
-    phone_number = models.CharField(max_length=11, unique=True, blank=False,validators=[phone_number_validator],
+    phone_number = models.TextField(unique=True, blank=False,validators=[phone_number_validator],
                                     help_text="Enter the 11 digit phone number in the format 1234567890 (no spaces or dashes).")
-    name = models.CharField(max_length=100, blank=True, null=True,
+    phone_number_key = models.BinaryField()
+    phone_number_hash = models.CharField(max_length=64, unique=True, blank=True, null=True)
+    name = models.TextField(blank=True, null=True,
                             help_text="Enter a first name for this number.")
+    name_key = models.BinaryField()
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -52,7 +56,7 @@ class PhoneNumber(models.Model):
     
 
     def __str__(self):
-        return self.phone_number
+        return f"PhoneNumber object (id: {self.id})"
     
     def clean(self):
         super().clean()
@@ -69,7 +73,28 @@ class PhoneNumber(models.Model):
                     raise ValidationError("Invalid phone number. It must be a mobile number.")
             except Exception as e:
                 raise ValidationError("Error validating phone number.Please check if this is a mobile number.")
+    
+    def validate_unique(self, exclude=None):
+        super().validate_unique(exclude)
+
+        if self.__class__.objects.filter(phone_number_hash=hashlib.sha256(self.phone_number.encode()).hexdigest()).exists():
+            raise ValidationError({
+                'phone_number': ValidationError(
+                    'Phone number already exists.',
+                    code='unique',
+                ),
+            })
+    @transaction.atomic
     def save(self, *args, **kwargs):
+
+        if self.phone_number:
+            self.phone_number_hash = hashlib.sha256(self.phone_number.encode()).hexdigest()
+            self.phone_number, self.phone_number_key = encrypt_data(self.phone_number)
+        if self.name:
+            self.name, self.name_key = encrypt_data(self.name)
+        super().save(*args, **kwargs)
+
+
         # Check if opted_in has been changed to True
         if self.pk is not None:
             orig = PhoneNumber.objects.get(pk=self.pk)
@@ -80,15 +105,16 @@ class PhoneNumber(models.Model):
                     message = welcome_message
                 success = retry_send_message_vonage(message, self, "sending welcome message", max_retries=3, retry_delay=5)
                 TextMessage.objects.create(phone_number=self, message=message, route="sending welcome message")
-                time.sleep(15)
+                time.sleep(5)
                 if self.pre_survey:
                     message = self.pre_survey
-                    success = retry_send_message_vonage(message, self, "sending welcome message", max_retries=3, retry_delay=5)
+                    success = retry_send_message_vonage(message, self, "sending pre survey link", max_retries=3, retry_delay=5)
                     TextMessage.objects.create(phone_number=self, message=message, route="sending pre survey link")
                 if success:
                     self.welcome_sent = True
 
         super().save(*args, **kwargs)
+
 
 
 class Topic(models.Model):

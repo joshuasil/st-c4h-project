@@ -6,6 +6,7 @@ from django.conf import settings
 # from .models import TextMessage
 import time
 import requests
+from .aws_kms_functions import decrypt_data
 
 client = vonage.Client(key=settings.VONAGE_KEY, secret=settings.VONAGE_SECRET, timeout=100)
 sms = vonage.Sms(client)
@@ -25,15 +26,18 @@ def splitter(message):
 
 def send_message_vonage(message, phone_number, route):
     # Add logging for sending messages via Vonage
-    logger.info(f"Sending message: {message} to phone number: {phone_number.phone_number}, route: {route}")
+    logger.info(f"Sending message: {message} to phone number: {phone_number.pk}, route: {route}")
     
     if phone_number.active:
         for message_text in splitter(message):
             # Send the message using Vonage SMS
-            response_data = sms.send_message({"from": settings.VONAGE_NUMBER, "to": str(phone_number.phone_number), "text": message_text, "type": "unicode"})
+            to_phone_number = decrypt_data(phone_number.phone_number, phone_number.phone_number_key)
+            # print("from: ", settings.VONAGE_NUMBER, "to: ", str(to_phone_number))
+            response_data = sms.send_message({"from": settings.VONAGE_NUMBER, "to": str(to_phone_number), "text": message_text, "type": "unicode"})
             # logger.info(f"Message sent sucessfully")
             if response_data["messages"][0]["status"] == "0":
                 logger.info("Message sent successfully.")
+                logger.info(f"Message details: {response_data}")
                 
                 # Log the sent message in the database
                 # TextMessage.objects.create(phone_number=phone_number, message=message_text, route=route)

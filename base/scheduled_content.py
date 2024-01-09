@@ -17,23 +17,6 @@ logger = logging.getLogger(__name__)
 
 values_to_filter = ["Healthy Eating","Getting Active","Healthy Sleep","Managing Weight"]
 
-# with codecs.open('base/dialog_eng_es.pickle', 'rb') as file:
-#     dialog_dict = pickle.load(file, encoding='latin1')
-
-
-# def get_week_num_andcurrent_weekday(created_at):
-#     print(type(created_at))
-#     timezone_offset = -7.0  # UTC-07:00 Mountain Time Zone
-#     tzinfo = timezone(timedelta(hours=timezone_offset))
-#     now = datetime.now(tz=created_at.tzinfo)
-#     print(type(now))
-#     week_num = now.hour - created_at.hour
-#     current_weekday = (now.minute // 11)%5
-#     if current_weekday == 0:
-#         current_weekday = 5
-#     logger.info(f"week_num: {week_num},current_weekday: {current_weekday} for {created_at} and {now}")
-#     return week_num, current_weekday
-
 def get_week_num_andcurrent_weekday(created_at):
     mst = timezone(timedelta(hours=-7))
     # Convert the datetime to MST
@@ -54,14 +37,6 @@ def get_week_num_andcurrent_weekday(created_at):
             current_weekday = 5
         return week_num, current_weekday
 
-# def get_week_num(created_at):
-    
-#     timezone_offset = -7.0  # UTC-07:00 Mountain Time Zone
-#     tzinfo = timezone(timedelta(hours=timezone_offset))
-#     now = datetime.now(tz=created_at.tzinfo)
-#     week_num = now.hour - created_at.hour
-#     logger.info(f"week_num: {week_num} for {created_at} and {now}")
-#     return week_num
 
 def get_week_num(created_at):
     # Get current datetime in UTC

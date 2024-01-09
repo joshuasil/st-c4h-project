@@ -15,26 +15,57 @@ import os
 from dotenv import load_dotenv
 import logging
 import sentry_sdk
+import boto3
+import socket
+from boto3.session import Session
 
-environment = os.getenv("ENVIRONMENT")
+
+hostname = socket.gethostname()
+
+if 'D2V-SilvasstarMBP' in hostname:
+    environment = 'dev'
+    print("Running on local machine")
+else:
+    print("Running on production server")
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 if environment == "dev":
     dotenv_path = BASE_DIR / '.env'
+    AWS_LOG_GROUP = "Chat4Heart"
+    AWS_LOG_STREAM = "Chat4Heart-StridePilotTestingStream-dev"
+    AWS_LOGGER_NAME = 'Chat4Heart-watchtower-logger-StridePilotTesting-dev'
 else:
     dotenv_path = BASE_DIR.parent / '.env'
+    AWS_LOG_GROUP = "Chat4Heart"
+    AWS_LOG_STREAM = "StridePilotTestingStream-prod"
+    AWS_LOGGER_NAME = 'watchtower-logger-StridePilotTesting-prod'
 
 # Load the .env file
 load_dotenv(dotenv_path=dotenv_path)
 
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_KMS_ARN = os.getenv('AWS_KMS_ARN')
+AWS_REGION_NAME = os.getenv('AWS_REGION_NAME', 'us-east-1')
 
+WELCOME_MESSAGE="Clinic Chat & Denver Health welcome you to Chat 4 Heart Health! We'll send you 4-5 messages every few days on different topics to support healthy habits.  You will be able ask me questions anytime, day or night and working with me could help you stay healthy. Anything you ask me is kept private. If you prefer messages in Spanish, text '1' here; Si prefieres mensajes en español, envía el mensaje '1' aquí. To get started, please answer this survey with questions about your health--if you have already answered this, thank you! We'll start sending you messages shortly."
+WELCOME_MESSAGE_ES="¡Clinic Chat y Denver Health le da la bienvenida a Chat del Corazón ! Le enviaremos de 4 a 5 mensajes cada pocos días sobre diferentes temas para fomentar hábitos saludables. Podrás hacerme preguntas en cualquier momento, de día o de noche, y trabajar conmigo podría ayudarte a mantenerte saludable. Todo lo que me preguntes se mantendrá privado. Para comenzar, complete esta encuesta rápida sobre su salud. Si ya has respondido esto, ¡gracias! Si ya has respondido esto, ¡gracias! Le enviaremos mensajes en breve."
 
-
+print("WELCOME_MESSAGE: ", WELCOME_MESSAGE)
 
 #disable registration
 REGISTRATION_OPEN = False
 
+
+logger_boto3_client = boto3.client(
+    "logs",
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    region_name=AWS_REGION_NAME,
+)
 
 
 
@@ -63,7 +94,7 @@ DEBUG = False
 CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = [
-'localhost','140.226.4.15','st.chat4heart.ucdenver.edu','127.0.0.1','pd2vweb871.ucdenver.pvt','140.226.13.221'
+'localhost','140.226.4.15','st.chat4heart.ucdenver.edu','127.0.0.1','pd2vweb871.ucdenver.pvt','140.226.13.221','3.87.88.123'
 ]
 
 
@@ -146,6 +177,7 @@ DATABASES = {
 print("DATABASE NAME: ", os.getenv('POSTGRES_DATABASE', None))
 print("DATABASE USER: ", os.getenv('POSTGRES_USERNAME', None))
 print("DATABASE PASSWORD: ", os.getenv('POSTGRES_PASSWORD', None))
+print("DATABASE HOST: ", POSTGRES_HOST)
 
 ADMINS = [
     # ('Joshua Silvasstar', 'joshva.silvasstar@clinicchat.com'),
@@ -236,8 +268,10 @@ DEFAULT_TO_EMAIL = [
 
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'debug.log')
 HANDLER_OPTIONS = ['console', 'file', 
-                #    'db_log'
+                #    'db_log',
+                #    'watchtower',
                    ]
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -271,6 +305,16 @@ LOGGING = {
             'class': 'customLogs.db_log_handler.DatabaseLogHandler',
             'filters': ['ignore_urls'],
         },
+        'watchtower': {
+            "level": "INFO",
+            "class": "watchtower.CloudWatchLogHandler",
+            "boto3_client": logger_boto3_client,
+            "log_group": AWS_LOG_GROUP,
+            # Different stream for each environment
+            "stream_name": AWS_LOG_STREAM,
+            "formatter": "verbose",
+            'filters': ['ignore_urls'],
+        },
 
     },
     'root': {
@@ -289,7 +333,6 @@ LOGGING = {
 }
 
 
-
 SCHEDULER_CONFIG = {
     "apscheduler.jobstores.default": {
         "class": "django_apscheduler.jobstores:DjangoJobStore"
@@ -301,10 +344,10 @@ SCHEDULER_CONFIG = {
 SCHEDULER_AUTOSTART = True
 SCHEDULER_SETTING = os.environ.get('SCHEDULER_SETTING')
 
-WELCOME_MESSAGE = os.getenv('WELCOME_MESSAGE', None)
+# WELCOME_MESSAGE = os.getenv('WELCOME_MESSAGE', None)
 OPT_IN_MESSAGE = os.getenv('OPT_IN_MESSAGE', None)
 OPT_IN_MESSAGE_ES = os.getenv('OPT_IN_MESSAGE_ES', None)
-WELCOME_MESSAGE_ES = os.getenv('WELCOME_MESSAGE_ES', None)
+# WELCOME_MESSAGE_ES = os.getenv('WELCOME_MESSAGE_ES', None)
 TOTAL_TOPICS = os.getenv('TOTAL_TOPICS', 8)
 
 SCHEDULE_MESSAGE_HOUR = os.getenv('SCHEDULE_MESSAGE_HOUR', 8)
@@ -318,6 +361,7 @@ TARGET_ARM_NAME = os.getenv('TARGET_ARM_NAME', 'test')
 VONAGE_KEY=os.getenv('VONAGE_KEY', None)
 VONAGE_SECRET=os.getenv('VONAGE_SECRET', None)
 VONAGE_NUMBER=os.getenv('VONAGE_NUMBER','18334298629')
+print("VONAGE_NUMBER: ", VONAGE_NUMBER)
 
 WATSON_API_KEY = os.getenv('WATSON_API_KEY')
 WATSON_ASSISTANT_ID = os.getenv('WATSON_ASSISTANT_ID')
@@ -335,5 +379,3 @@ IGNORABLE_404_URLS = [
     re.compile(r"^/favicon\.ico$"),
     re.compile(r"^/robots\.txt$"),
 ]
-
-
