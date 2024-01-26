@@ -177,7 +177,7 @@ DATABASES = {
         'USER': os.getenv('POSTGRES_USERNAME', None),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', None),
         'HOST': POSTGRES_HOST,
-        'PORT': '',
+        'PORT': POSTGRES_PORT,
     }
 }
 # # Print the variables for debugging
