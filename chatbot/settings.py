@@ -275,7 +275,7 @@ DEFAULT_TO_EMAIL = [
 
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'debug.log')
 HANDLER_OPTIONS = ['console', 'file', 
-                #    'db_log',
+                   'db_log',
                 #    'watchtower',
                    ]
 
