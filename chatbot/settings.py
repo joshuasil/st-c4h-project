@@ -165,8 +165,10 @@ WSGI_APPLICATION = 'chatbot.wsgi.application'
 
 if environment == "dev":
     POSTGRES_HOST = 'localhost'
+    POSTGRES_PORT = '5432'
 else:
     POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'localhost')
+    POSTGRES_PORT = '5434'
 
 DATABASES = {
     'default': {
