@@ -3,6 +3,7 @@ import logging
 
 from django.contrib import admin
 from django.utils.html import format_html
+from rangefilter.filters import DateRangeFilter
 
 from .models import StatusLog
 
@@ -12,8 +13,12 @@ DJANGO_DB_LOGGER_ADMIN_LIST_PER_PAGE = 25
 class StatusLogAdmin(admin.ModelAdmin):
     list_display = ('colored_msg', 'traceback', 'create_datetime_format')
     list_display_links = ('colored_msg', )
-    list_filter = ('level', )
+    list_filter = (
+        'level', 
+        ('create_datetime', DateRangeFilter),
+    )
     list_per_page = DJANGO_DB_LOGGER_ADMIN_LIST_PER_PAGE
+    # search_fields = ['msg']
 
     def colored_msg(self, instance):
         if instance.level in [logging.NOTSET, logging.INFO]:
