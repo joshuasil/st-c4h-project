@@ -166,25 +166,26 @@ WSGI_APPLICATION = 'chatbot.wsgi.application'
 if environment == "dev":
     POSTGRES_HOST = 'localhost'
     POSTGRES_PORT = '5432'
+    POSTGRES_USERNAME = os.getenv('POSTGRES_USERNAME_DEV', None)
+    POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD_DEV', None)
+
 else:
     POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'localhost')
     POSTGRES_PORT = '5434'
+    POSTGRES_USERNAME = os.getenv('POSTGRES_USERNAME', None)
+    POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD', None)
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.getenv('POSTGRES_DATABASE', None),
-        'USER': os.getenv('POSTGRES_USERNAME', None),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', None),
+        'USER': POSTGRES_USERNAME,
+        'PASSWORD': POSTGRES_PASSWORD,
         'HOST': POSTGRES_HOST,
         'PORT': POSTGRES_PORT,
     }
 }
-# # Print the variables for debugging
-# print("DATABASE NAME: ", os.getenv('POSTGRES_DATABASE', None))
-# print("DATABASE USER: ", os.getenv('POSTGRES_USERNAME', None))
-# print("DATABASE PASSWORD: ", os.getenv('POSTGRES_PASSWORD', None))
-# print("DATABASE HOST: ", POSTGRES_HOST)
+
 
 ADMINS = [
     # ('Joshua Silvasstar', 'joshva.silvasstar@clinicchat.com'),
