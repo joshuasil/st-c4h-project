@@ -98,7 +98,7 @@ DEBUG = False
 CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = [
-'localhost','140.226.4.15','st.chat4heart.ucdenver.edu','127.0.0.1','pd2vweb871.ucdenver.pvt','140.226.13.221','3.87.88.123'
+'localhost', '52.200.247.160','stride-c4h.clinicchat.com'
 ]
 
 
@@ -276,7 +276,7 @@ DEFAULT_TO_EMAIL = [
 
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'debug.log')
 HANDLER_OPTIONS = ['console', 'file', 
-                   'db_log',
+                #    'db_log',
                 #    'watchtower',
                    ]
 
