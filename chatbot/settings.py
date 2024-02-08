@@ -52,13 +52,8 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_KMS_ARN = os.getenv('AWS_KMS_ARN')
 AWS_REGION_NAME = os.getenv('AWS_REGION_NAME', 'us-east-1')
 
-# WELCOME_MESSAGE="Clinic Chat & Denver Health welcome you to Chat 4 Heart Health! We'll send you 4-5 messages every few days on different topics to support healthy habits.  You will be able ask me questions anytime, day or night and working with me could help you stay healthy. Anything you ask me is kept private. If you prefer messages in Spanish, text '1' here; Si prefieres mensajes en español, envía el mensaje '1' aquí. To get started, please answer this survey with questions about your health--if you have already answered this, thank you! We'll start sending you messages shortly."
-# WELCOME_MESSAGE_ES="¡Clinic Chat y Denver Health le da la bienvenida a Chat del Corazón ! Le enviaremos de 4 a 5 mensajes cada pocos días sobre diferentes temas para fomentar hábitos saludables. Podrás hacerme preguntas en cualquier momento, de día o de noche, y trabajar conmigo podría ayudarte a mantenerte saludable. Todo lo que me preguntes se mantendrá privado. Para comenzar, complete esta encuesta rápida sobre su salud. Si ya has respondido esto, ¡gracias! Si ya has respondido esto, ¡gracias! Le enviaremos mensajes en breve."
-
-WELCOME_MESSAGE = os.getenv('WELCOME_MESSAGE', None)
-WELCOME_MESSAGE_ES = os.getenv('WELCOME_MESSAGE_ES', None)
-print("WELCOME_MESSAGE: ", WELCOME_MESSAGE)
-print("WELCOME_MESSAGE_ES: ", WELCOME_MESSAGE_ES)
+WELCOME_MESSAGE="Clinic Chat & Stride Community Health welcome you to Chat 4 Heart Health! We'll send you 4-5 messages every few days on different topics to support healthy habits.  You will be able ask me questions anytime, day or night and working with me could help you stay healthy. Anything you ask me is kept private. If you prefer messages in Spanish, text '1' here; Si prefieres mensajes en español, envía el mensaje '1' aquí. To get started, please answer this survey with questions about your health--if you have already answered this, thank you! We'll start sending you messages shortly."
+WELCOME_MESSAGE_ES="¡Clinic Chat y Stride le da la bienvenida a Chat del Corazón ! Le enviaremos de 4 a 5 mensajes cada pocos días sobre diferentes temas para fomentar hábitos Strideables. Podrás hacerme preguntas en cualquier momento, de día o de noche, y trabajar conmigo podría ayudarte a mantenerte Strideable. Todo lo que me preguntes se mantendrá privado. Para comenzar, complete esta encuesta rápida sobre su Stride. Si ya has respondido esto, ¡gracias! Si ya has respondido esto, ¡gracias! Le enviaremos mensajes en breve."
 
 #disable registration
 REGISTRATION_OPEN = False
@@ -352,10 +347,8 @@ SCHEDULER_CONFIG = {
 SCHEDULER_AUTOSTART = True
 SCHEDULER_SETTING = os.environ.get('SCHEDULER_SETTING')
 
-# WELCOME_MESSAGE = os.getenv('WELCOME_MESSAGE', None)
 OPT_IN_MESSAGE = os.getenv('OPT_IN_MESSAGE', None)
 OPT_IN_MESSAGE_ES = os.getenv('OPT_IN_MESSAGE_ES', None)
-# WELCOME_MESSAGE_ES = os.getenv('WELCOME_MESSAGE_ES', None)
 TOTAL_TOPICS = os.getenv('TOTAL_TOPICS', 8)
 
 SCHEDULE_MESSAGE_HOUR = os.getenv('SCHEDULE_MESSAGE_HOUR', 8)
