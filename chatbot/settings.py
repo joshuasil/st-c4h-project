@@ -52,8 +52,16 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_KMS_ARN = os.getenv('AWS_KMS_ARN')
 AWS_REGION_NAME = os.getenv('AWS_REGION_NAME', 'us-east-1')
 
+WELCOME_MESSAGE_CONTROL = "Your healthcare provider is sending you three messages each week for the next 2 months to help you manage your health. Look for them every couple of days starting next week. To get started, please answer this survey with questions about your health--if you have already answered this, thank you! We'll start sending you messages shortly."
+WELCOME_MESSAGE_CONTROL_ES = "Su proveedor de atención médica le enviará tres mensajes cada semana durante los próximos 2 meses para ayudarlo a controlar su salud. Búscalos cada dos o tres días a partir de la próxima semana. Para comenzar, complete esta encuesta rápida sobre su salud. Si ya has respondido esto, ¡gracias! Si ya has respondido esto, ¡gracias! Le enviaremos mensajes en breve."
 WELCOME_MESSAGE="Clinic Chat & Stride Community Health welcome you to Chat 4 Heart Health! We'll send you 4-5 messages every few days on different topics to support healthy habits.  You will be able ask me questions anytime, day or night and working with me could help you stay healthy. Anything you ask me is kept private. If you prefer messages in Spanish, text '1' here; Si prefieres mensajes en español, envía el mensaje '1' aquí. To get started, please answer this survey with questions about your health--if you have already answered this, thank you! We'll start sending you messages shortly."
 WELCOME_MESSAGE_ES="¡Clinic Chat y Stride le da la bienvenida a Chat del Corazón ! Le enviaremos de 4 a 5 mensajes cada pocos días sobre diferentes temas para fomentar hábitos Strideables. Podrás hacerme preguntas en cualquier momento, de día o de noche, y trabajar conmigo podría ayudarte a mantenerte Strideable. Todo lo que me preguntes se mantendrá privado. Para comenzar, complete esta encuesta rápida sobre su Stride. Si ya has respondido esto, ¡gracias! Si ya has respondido esto, ¡gracias! Le enviaremos mensajes en breve."
+FINAL_MESSAGE_CONTROL = "Stride thanks you for being a part of Chat 4 Heart Health! Please take a few minutes now to complete this quick follow-up survey about your health. "
+FINAL_MESSAGE_CONTROL_ES = "¡Stride le agradece por ser parte de Chat del Corazón ! Tómese unos minutos ahora para completar esta rápida encuesta de seguimiento sobre su Stride."
+FINAL_MESSAGE = "Stride thanks you for being a part of Chat 4 Heart Health! Feel free to keep chatting with us about healthy habits. Please take a few minutes now to complete this quick follow-up survey about your health. "
+FINAL_MESSAGE_ES = "¡Stride le agradece por ser parte de Chat del Corazón ! No dudes en seguir charlando con nosotros sobre hábitos Strideables. Tómese unos minutos ahora para completar esta rápida encuesta de seguimiento sobre su Stride."
+print("WELCOME_MESSAGE: ", WELCOME_MESSAGE)
+print("WELCOME_MESSAGE_ES: ", WELCOME_MESSAGE_ES)
 
 #disable registration
 REGISTRATION_OPEN = False
