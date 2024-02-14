@@ -78,16 +78,14 @@ logger_boto3_client = boto3.client(
 
 
 # Choose the DSN based on the environment
-if environment == "dev":
-    dsn = "https://6c354df327d274cee17b78ed5784bea3@o4505835707957248.ingest.sentry.io/4506515913572352"
-else:
+if environment != "dev":
     dsn = "https://3ff61de170e72b5dbf67ed3c7d4213f2@o4505835707957248.ingest.sentry.io/4506515865796608"
 
-sentry_sdk.init(
-    dsn=dsn,
-    traces_sample_rate=1.0,
-    profiles_sample_rate=1.0,
-)
+    sentry_sdk.init(
+        dsn=dsn,
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
 
 
 # Quick-start development settings - unsuitable for production
